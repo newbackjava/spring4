@@ -1,0 +1,5 @@
+SELECT * FROM shop2.member;
+delete from member;
+INSERT INTO shop2.member (id, pw, name, tel) VALUES
+('apple', '1234', 'apple', '011'),
+('ice', '1234', 'ice', '012');

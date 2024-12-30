@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+
+<div layout:fragment="content">
+    <!-- 로그인 폼 -->
+    <div th:if="${session.id == null}" class="container mt-5">
+        <h4  class="row justify-content-center" style="color: red;">[[${result}]]</h4>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 col-sm-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">회원 로그인</h2>
+                            <form action="/member/login" method="post" th:action="@{/member/login}" th:method="post">
+                                <div class="mb-3">
+                                    <label for="id" class="form-label">ID:</label>
+                                    <input type="text" id="id" name="id" class="form-control" th:value="${id}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pw" class="form-label">PW:</label>
+                                    <input type="password" id="pw" name="pw" class="form-control" required>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">회원로그인</button>
+                                    <a href="/member/create" class="btn btn-secondary btn-lg">회원가입</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로그인 후 화면 -->
+    <div th:if="${session.id != null}" class="container mt-5">
+        <div class="alert alert-success text-center">
+            <img src="/img/bye.png" alt="환영 이미지" class="mb-3" style="width: 100px; height: auto;">
+            <strong th:text="'ID: ' + ${session.id}"></strong>님 환영합니다!
+            <br><br><br>
+
+            <table class="table mx-auto text-center">
+                <tr>
+                    <td>
+                        <form action="/member/read" method="post">
+                            <input type="hidden" name="id" th:value="${session.id}">
+                            <button type="submit" class="btn btn-primary btn-lg" style="height: 100px;">회원 정보보기</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a th:href="@{/member/update(id=${session.id})}">
+                            <button type="button" class="btn btn-info btn-lg" style="height: 100px;">회원 정보수정</button>
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{/member/delete(id=${session.id})}">
+                            <button type="button" class="btn btn-warning btn-lg" style="height: 100px;">회원 탈퇴</button>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/member/logout">
+                            <button type="button" class="btn btn-secondary btn-lg"  style="height: 100px;">회원 로그아웃</button>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <hr>
+</div>
+
+</body>
+</html>

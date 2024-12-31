@@ -98,8 +98,36 @@ public class MemberController {
     }
 
     @GetMapping("delete")
-    public String delete(String id, Model model) {
+    public String delete(String id, HttpSession session) {
+        //컨트롤러의 메서드를 호출시 사용해야할 객체는
+        //스프링에게 달라고 하면 됨. 메서드이름(요청객체, 요청객체2)
         System.out.println("member id >>>>>>>>>>>>> " + id);
-        return "member/member";
+        int result = memberService.delete(id);
+        if (result > 0) { //성공하면, 세션 삭제후,
+            session.removeAttribute("id");
+            return "member/member";
+        }else{
+            return "error/error";
+        }
+    }
+
+    @GetMapping("update") //수정 화면 요청
+    public String update(String id, Model model) {
+        System.out.println("member id >>>>>>>>>>>>> " + id);
+        //id로 검색한 것을 수정화면에 보내자.
+        MemberVO memberVO =  memberService.read(id);
+        model.addAttribute("memberVO", memberVO);
+        return "member/update";
+    }
+
+    @PostMapping("update2") //수정 처리 요청
+    public String update2(MemberVO memberVO) {
+        System.out.println("memberVO >>>>>>>>>>>>> " + memberVO);
+        int result = memberService.update(memberVO);
+        if (result > 0) {
+            return "member/update2";
+        }else{
+            return "error/error";
+        }
     }
 }

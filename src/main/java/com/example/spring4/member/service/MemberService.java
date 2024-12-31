@@ -43,6 +43,14 @@ public class MemberService {
     public MemberVO read(String id) {
         return memberMapper.selectMemberById(id);
     }
+
+    public int delete(String id) {
+        return memberMapper.deleteMember(id);
+    }
+
+    public int update(MemberVO memberVO) {
+        return memberMapper.updateMember(memberVO);
+    }
     //요청하나당 함수하나
     //처리내용
     // - 전처리하고 나서

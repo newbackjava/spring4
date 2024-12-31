@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 //아래 선언된 멤버변수에 객체의 주소를 찾아서 다 넣어줌.
 public class MemberService {
 
-    final MemberMapper memberMapper; //200(DI)
-    //PasswordEncoder passwordEncoder; //300
+    private final MemberMapper memberMapper; //200(DI)
+    private final PasswordEncoder passwordEncoder; //300(DI)
 
     public boolean login(MemberVO memberVO) {
         //전처리하고
@@ -30,6 +30,19 @@ public class MemberService {
         }
         //후처리
     }//login
+
+    public int create2(MemberVO memberVO) {
+        //mapper에게 주고 db처리해줘...
+        String pw2 = passwordEncoder.encode(memberVO.getPw());
+        memberVO.setPw(pw2);
+        System.out.println("vo에 암호화된 pw >>>>>> " + memberVO.getPw());
+        int result = memberMapper.insertMember(memberVO);
+        return result;
+    }
+
+    public MemberVO read(String id) {
+        return memberMapper.selectMemberById(id);
+    }
     //요청하나당 함수하나
     //처리내용
     // - 전처리하고 나서

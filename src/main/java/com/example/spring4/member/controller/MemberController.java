@@ -4,6 +4,8 @@ import com.example.spring4.member.service.MemberService;
 import com.example.spring4.member.vo.MemberVO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("member") //contextpath/member
 @RequiredArgsConstructor //@Autowired
 //멤버변수 @Autowired로 주입해줄 것을 모두 찾아서 넣어줌.
+//@Slf4j //기본으로 지정된 클래스를 써줘(log-back 사용)
+@Log4j2 //Slf4j표준에 따라서 만든 클래스인 Log4j를 써줘!
 public class MemberController {
 
     //싱글톤은 프로젝트 시작할 때 만들어짐.@Service마찬가지
@@ -29,8 +33,19 @@ public class MemberController {
 //    BService b;
     @GetMapping("create") //contextpath/member/create
     public String create() {
+        log.info(">>>>>>> 화면 요청 로그기록 >>>>>>>>>");
         System.out.println("create 화면 요청>>>>>>>>>>>>>>>> ");
         return "member/create";
+    }
+
+    @PostMapping("create2")
+    public String create2(MemberVO memberVO) {
+        //스프링에게 클라이언트가 입력한 정보를 받아서 vo객체생성 후
+        //다 넣어줘. 제어를 프로그래머가 아니고 스프링이 다 해준다. (제어의 역전, IoC)
+        //vo에 set메서드를 불러서 넣어주기 때문에 set메서드가 있어야함.
+        System.out.println("memberVO =>>>>>>>>>> " + memberVO);
+        memberService.create2(memberVO);
+        return "member/member";
     }
 
     @GetMapping("member") //contextpath/member/member
@@ -64,5 +79,27 @@ public class MemberController {
         // java, xml, properties를
         //다 스캔해서 싱글톤으로 만든다.
        return "member/member"; //로그인 페이지!
+    }
+
+    @GetMapping("logout") //컨텍스트패스/member/logout
+    public String logout(HttpSession session) {
+        session.removeAttribute("id");
+        System.out.println("로그아웃 성공 ============================== ");
+        return "member/member";
+    }
+
+    @PostMapping("read")
+    public String read(String id, Model model) { //<input name="id"
+        System.out.println("member id >>>>>>>>>>>>> " + id);
+        MemberVO memberVO = memberService.read(id);
+        //view가 되는 read.html로 memberVO를 보내야하는 경우 Model model객체 필요
+        model.addAttribute("memberVO", memberVO);
+        return "member/read";
+    }
+
+    @GetMapping("delete")
+    public String delete(String id, Model model) {
+        System.out.println("member id >>>>>>>>>>>>> " + id);
+        return "member/member";
     }
 }

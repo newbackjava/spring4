@@ -3,6 +3,7 @@ package com.example.spring4.member.service;
 import com.example.spring4.member.dao.MemberMapper;
 import com.example.spring4.member.vo.MemberVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +15,22 @@ public class MemberService {
     private final MemberMapper memberMapper; //200(DI)
     private final PasswordEncoder passwordEncoder; //300(DI)
 
+//    @Autowired
+//    public MemberService( MemberMapper memberMapper,
+//                          PasswordEncoder passwordEncode){
+//        this.memberMapper = memberMapper;
+//        this.passwordEncoder = passwordEncode;
+//    } //객체생성시 생성자호출할 때 생성자의 파라메터 값으로 
+    //두 개의 주소를 찾아서 멤버변수에 넣어주는 방식
+//생성자 주입 방식
+
     public boolean login(MemberVO memberVO) {
         //전처리하고
         //dao를 찾아서 --> ok
         //dao.메서드 호출
         MemberVO memberVO1 = memberMapper.selectMemberById(memberVO.getId());
         if (memberVO1 != null) {
-            if (memberVO1.getPw().equals(memberVO.getPw())) {
+            if (passwordEncoder.matches(memberVO.getPw(), memberVO1.getPw())) {
                 return true; //로그인 성공
             } else {
                 return false; //로그인 실패

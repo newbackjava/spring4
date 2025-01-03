@@ -61,6 +61,13 @@ public class MemberService {
     public int update(MemberVO memberVO) {
         return memberMapper.updateMember(memberVO);
     }
+
+    public boolean checkId(String id) {
+        return memberMapper.selectMemberById(id) == null;
+        //가입하려고 하는 id를 가지고 검색을 해서 null이 아니면 
+        //이 아이디로 이미 가입이 되어있다라는 얘기 --> 사용할 수 없는 아이디로 처리!
+        //null이면 이 id로 가입한 사람이 없다라는 얘기 --> 사용할 수 있는 아이디로 처리!
+    }
     //요청하나당 함수하나
     //처리내용
     // - 전처리하고 나서

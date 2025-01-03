@@ -9,9 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller //싱글톤객체생성 + 아래에 나온 주소와 함수를 스프링에 등록
 @RequestMapping("member") //contextpath/member
@@ -130,4 +128,21 @@ public class MemberController {
             return "error/error";
         }
     }
+
+    @GetMapping("checkId")
+    @ResponseBody
+    //뷰인 template가지 않고 단순한데이터나 json으로 보내겠다.
+    public boolean checkId(@RequestParam String id) {
+        //html이 아니라 체크한 결과를 단순하게 데이터를 보내는 경우
+        //컨트롤러에서 바로 템플릿안쓰고 보낼 수 있음.
+        System.out.println("member id >>>>>>>>>>>>> " + id);
+        boolean result = memberService.checkId(id);
+        //리턴은 http body로 단순한 데이터를 보내겠다라는 의미
+        //return "아이디가 중복되지 않음. 사용가능 아이디임.";
+        return result; //사용가능한 경우, 중복되지 않음.
+    }
+
+
+
+
 }

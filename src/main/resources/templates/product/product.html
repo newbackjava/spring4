@@ -2,10 +2,69 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
+<head>
+    <style>
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .card img {
+            width: 50%;
+            height: auto;
+            border-radius: 5px;
+            margin: 0 auto 15px auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            margin-bottom: 15px;
+        }
+
+        .card button {
+            background-color: #ffecb5;
+            color: #6c757d;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background-color: #86b7fe;
+        }
+    </style>
+</head>
 <body>
 
 <div layout:fragment="content">
-상품목록 화면.....
+    <div class="container">
+        <div class="card-container">
+            <!-- Thymeleaf template logic to iterate over JSON objects -->
+            <div th:each="item : ${items}" class="card">
+                <img th:src="${item.image}" alt="물건 이미지">
+                <h3 th:text="${item.name}">물건 이름</h3>
+                <p th:text="${item.description}">물건 설명</p>
+                <button th:onclick="|location.href='/product/read/' + ${item.id}|">자세히 보기</button>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

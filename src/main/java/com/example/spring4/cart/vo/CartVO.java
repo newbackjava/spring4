@@ -14,5 +14,5 @@ public class CartVO {
     private long no;
     private long productId;
     private String memberId;
-    private int count = 1;
+    private int count = 1; //초기값
 }

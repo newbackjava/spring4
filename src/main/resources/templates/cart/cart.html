@@ -41,13 +41,24 @@
                                 <td>[[${cart.productName}]]</td>
                                 <td>[[${cart.productPrice}]]</td>
                                 <td>
-                                    <input type="number" th:value="${cart.count}">
+                                    <!-- 반복문으로 만들어진 input의 데이터를 가지고 오려면
+                                        유니크한 아이디를 생성해주어야 자바스크립트에서
+                                        해당하는 input의 값을 가지고 올 수 있다.!
+                                    -->
+                                    <input type="number"
+                                           th:id="'count' + ${cart.no}"
+                                           th:value="${cart.count}">
                                 </td>
                                 <td>
-                                    <button>수정</button>
+                                    <button class="btn btn-outline-dark"
+                                            th:data-no = "${cart.no}"
+                                            th:data-count = "${cart.count}"
+                                            onclick="updateCount(this)">수정</button>
                                 </td>
                                 <td>
-                                    <button>삭제</button>
+                                    <button class="btn btn-outline-dark"
+                                            th:data-no = "${cart.no}"
+                                            onclick="deleteProduct(this)">삭제</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -74,4 +85,44 @@
     </div>
 </div>
 </body>
+<th:block layout:fragment="script">
+    <script>
+        function deleteProduct(button) {
+           // DELETE FROM cart
+           // WHERE no = #{no}
+           // th:data-no = "${cart.no}"
+            const no = button.dataset.no;
+            alert(no);
+            axios.post("/cart/delete", {
+                no: no
+            }).then(function (response) {
+                if(response.data){
+                    alert("삭제되었습니다.");
+                    location.reload();//페이지 다시 불러오기
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+        };
+        function updateCount(button) {
+            // UPDATE cart
+            // SET count = #{count}
+            // WHERE no = #{no}
+            const no = button.dataset.no;
+            const count = document.getElementById("count" + no).value;
+            alert(no +  " " + count);
+            axios.post("/cart/update", {
+                no: no,
+                count: count
+            }).then(function (response) {
+                if(response.data){
+                    alert("수정되었습니다.");
+                    location.reload();//페이지 다시 불러오기
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+        };
+    </script>
+</th:block>
 </html>

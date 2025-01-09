@@ -75,11 +75,43 @@
         <p th:text="${productVO.content}"></p>
         <p th:text="${productVO.price}"></p>
         <button onclick="history.back()">뒤로가기</button>
-        <button th:if="${session.id != null}" class="cart-button">
+        <button th:if="${session.id != null}" class="cart-button"
+                onclick="addToCart()">
             장바구니에 담기
         </button>
     </div>
 </div>
-
 </body>
+<th:block layout:fragment="script">
+    <script>
+        function addToCart() {
+            alert("장바구니 넣기 호출")
+            // INSERT INTO cart(memberId, productId, count)
+            // VALUES (#{memberId}, #{productId}, #{count})
+            const memberId = '[[${session.id}]]';
+            //const memberId = 'apple';
+            const productId = '[[${productVO.productId}]]';
+            //const productId = '24';
+            //const productId = 24;
+            //타임리프로 출력한 결과가 숫자인 경우에는 '생략가능
+            //axios.post("주소", {json데이터})
+            axios.post("/cart/create", {
+                memberId: memberId,
+                productId: productId
+            }).then(function (response) {
+                if(response.data) {
+                    alert("장바구니에 추가되었습니다.");
+                    const result = confirm("장바구니로 이동하시겠습니까?");
+                    if(result){
+                        //get방식
+                        location.href = "/cart/cart";
+                    }
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+
+        }
+    </script>
+</th:block>
 </html>

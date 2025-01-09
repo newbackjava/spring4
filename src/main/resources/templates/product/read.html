@@ -58,38 +58,26 @@
             background-color: #218838;
         }
     </style>
-
-    <script>
-        function addToCart(button) {
-            const itemId = button.getAttribute('data-id');
-            const itemName = button.getAttribute('data-name');
-
-            axios.post('/basket/create', {
-                id: itemId,
-                name: itemName
-            })
-                .then(response => {
-                    alert("장바구니에 추가되었습니다: " + response.data.message);
-                })
-                .catch(error => {
-                    console.error("장바구니 추가 중 오류 발생:", error);
-                    alert("장바구니에 추가하는 동안 문제가 발생했습니다.");
-                });
-        }
-    </script>
 </head>
 <body>
 
 <div layout:fragment="content">
     <div class="detail-container">
-        <img th:src="${itemVO.image}" alt="물건 이미지">
-        <h3 th:text="${itemVO.name}">물건 이름</h3>
-        <p th:text="${itemVO.description}">물건 설명</p>
-        <button onclick="history.back()">뒤로 가기</button>
-        <button class="cart-button"
-                th:data-id="${itemVO.id}"
-                th:data-name="${itemVO.name}"
-                onclick="addToCart(this)">장바구니에 담기</button>
+    <!--
+            이미지 넣고
+            이름 넣고
+            설명 넣고
+            가격 넣고
+            뒤로가기 버튼
+            -->
+        <img th:src="'/img/' + ${productVO.img}">
+        <h3 th:text="${productVO.name}"></h3>
+        <p th:text="${productVO.content}"></p>
+        <p th:text="${productVO.price}"></p>
+        <button onclick="history.back()">뒤로가기</button>
+        <button th:if="${session.id != null}" class="cart-button">
+            장바구니에 담기
+        </button>
     </div>
 </div>
 

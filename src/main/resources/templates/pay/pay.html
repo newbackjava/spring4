@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="container mt-5">
+    <button onclick="requestPay()">결제하기</button>
+  </div>
+</div>
+<th:block layout:fragment="script">
+  <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+  <script>
+    // 포트원 초기화: 발급받은 가맹점 식별자 입력
+    var IMP = window.IMP;
+    IMP.init("imp27020872"); // "imp00000000"은 테스트 가맹점 코드, 실제 사용 시 가맹점 고유 식별자를 사용
+
+
+
+    function requestPay() {
+      let payData = {
+        pg: "danal_tpay", // PG사 (ex: 이니시스)
+        pay_method: "card", // 결제 방식 (카드, 가상계좌, 계좌이체 등)
+        merchant_uid: `order_${new Date().getTime()}`, // 주문 번호
+        name: "상품명 예시", // 상품명
+        amount: 1000, // 결제 금액
+        buyer_email: "buyer@example.com", // 구매자 이메일
+        buyer_name: "홍길동", // 구매자 이름
+        buyer_tel: "010-1234-5678", // 구매자 전화번호
+        buyer_addr: "서울특별시 강남구", // 구매자 주소
+        buyer_postcode: "12345" // 구매자 우편번호
+      }
+      IMP.request_pay(payData,
+              function (rsp) {
+                // 콜백 함수: 결제 결과 처리
+                if (rsp.success) {
+                  alert("결제가 성공했습니다.");
+                  console.log("결제 성공 데이터: ", rsp);
+                  // 서버로 결제 데이터 전달
+                  // 결제 데이터 서버로 전송
+                  // 결제 성공 데이터(resultData) 생성
+                  let resultData = {
+                    applyNum: rsp.apply_num,
+                    bankName: rsp.bank_name,
+                    buyerAddr: rsp.buyer_addr,
+                    buyerEmail: rsp.buyer_email,
+                    buyerName: rsp.buyer_name,
+                    buyerPostcode: rsp.buyer_postcode,
+                    buyerTel: rsp.buyer_tel,
+                    cardName: rsp.card_name,
+                    cardNumber: rsp.card_number,
+                    cardQuota: rsp.card_quota,
+                    currency: rsp.currency,
+                    customData: rsp.custom_data,
+                    impUid: rsp.imp_uid,
+                    merchantUid: rsp.merchant_uid,
+                    name: rsp.name,
+                    paidAmount: rsp.paid_amount,
+                    paidAt: rsp.paid_at,
+                    payMethod: rsp.pay_method,
+                    pgProvider: rsp.pg_provider,
+                    pgTid: rsp.pg_tid,
+                    pgType: rsp.pg_type,
+                    receiptUrl: rsp.receipt_url,
+                    status: rsp.status,
+                    success: rsp.success
+                  };
+                  console.log(resultData.pay_method);
+                  console.log(resultData);
+                  axios .post('/pay/confirm', resultData)
+                        .then(function (response) {
+                          console.log('결제 데이터 전송 성공:', response.data); })
+                        .catch(error => {
+                          console.error('결제 데이터 전송 실패:', error);
+                        })
+                } else {
+                  alert("결제에 실패했습니다. 에러 내용: " + response.error_msg);
+                }
+              }
+      );
+    }
+  </script>
+</th:block>

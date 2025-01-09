@@ -65,6 +65,9 @@
                         <li th:if="${session.id == null}"
                                 class="nav-item"><a class="nav-link" href="/member/member">로그인</a></li>
                         <li class="nav-item"><a class="nav-link" href="/member/member">회원정보</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/pay/pay">결제</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/chart/chart">차트</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/map/map">지도보기</a></li>
                         <li class="nav-item"><a class="nav-link" href="/board/board">게시판</a></li>
                         <li class="nav-item"><a class="nav-link" href="/product/product">상품정보</a></li>
                         <li class="nav-item"><a class="nav-link" href="/cart/cart">장바구니</a></li>
@@ -109,6 +112,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- axios 비동기 통신용 -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
 
 <!-- Core theme JS-->
     <script th:src="@{/js/scripts.js}"></script>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="container mt-5">
+    <div id="map" style="width:100%;height:350px;"></div>
+    <button onclick="kakaoMap()">지도보기(서버에서 json받아온 것으로)</button>
+    <button onclick="kakaoMap2()">지도보기(서버에서 json받아온 것으로)</button>
+  </div>
+</div>
+<th:block layout:fragment="script">
+  <!-- port: http://localhost:8888 또는 http://127.0.0.1:8888 -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5675f8f4dffbfd2b726b7b6393fd2b78"></script>
+  <script>
+    let lat = 37.5123926;
+    let lng = 127.0588673;
+    function kakaoMap() {
+               var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                        mapOption = {
+                          center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
+                          level: 4 // 지도의 확대 레벨
+                        };
+                console.log("11111111111111111111111111111111111111")
+
+                var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+                console.log("22222222222222222222222222222222222222")
+
+                var imageSrc = 'https://newsimg-hams.hankookilbo.com/2022/10/25/3651cc69-8c2f-4d08-bb04-c119f5d9af38.jpg', // 마커이미지의 주소입니다
+                        imageSize = new kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+                        imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+                // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+                        markerPosition = new kakao.maps.LatLng(lat, lng); // 마커가 표시될 위치입니다
+
+                console.log("33333333333333333333333333333333333333")
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                  position: markerPosition,
+                  image: markerImage // 마커이미지 설정
+                });
+
+                console.log("44444444444444444444444444444444444")
+                // 마커가 지도 위에 표시되도록 설정합니다
+                marker.setMap(map);
+              }
+
+
+    function kakaoMap2() {
+      let lat = 0;
+      let lng = 0;
+      axios .get('/map/map2')
+              .then(function (response) {
+                console.log('결제 데이터 전송 성공:', response.data);
+                lat = response.data[0].lat;
+                lng = response.data[0].lng;
+
+                var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                        mapOption = {
+                          center: new kakao.maps.LatLng(lat, lng), // 지도의 중심좌표
+                          level: 4 // 지도의 확대 레벨
+                        };
+                console.log("11111111111111111111111111111111111111")
+
+                var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+                console.log("22222222222222222222222222222222222222")
+
+                var imageSrc = 'https://newsimg-hams.hankookilbo.com/2022/10/25/3651cc69-8c2f-4d08-bb04-c119f5d9af38.jpg', // 마커이미지의 주소입니다
+                        imageSize = new kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+                        imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+                // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+                        markerPosition = new kakao.maps.LatLng(lat, lng); // 마커가 표시될 위치입니다
+
+                console.log("33333333333333333333333333333333333333")
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                  position: markerPosition,
+                  image: markerImage // 마커이미지 설정
+                });
+
+                console.log("44444444444444444444444444444444444")
+                // 마커가 지도 위에 표시되도록 설정합니다
+                marker.setMap(map);
+              });
+    }
+  </script>
+</th:block>

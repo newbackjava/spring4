@@ -56,15 +56,27 @@
 <div layout:fragment="content">
     <div class="container">
         <div class="card-container">
-            <!-- Thymeleaf template logic to iterate over JSON objects -->
-            <div th:each="item : ${items}" class="card">
-                <img th:src="${item.image}" alt="물건 이미지">
-                <h3 th:text="${item.name}">물건 이름</h3>
-                <p th:text="${item.description}">물건 설명</p>
-                <button th:onclick="|location.href='/product/read/' + ${item.id}|">자세히 보기</button>
-            </div>
+          <div th:each="item : ${list}" class="card">
+              <img th:src="'/img/' + ${item.img}" th:alt="${item.img}">
+              <h3>[[${item.name}]]</h3>
+              <p th:text="${item.price} + '원'"></p>
+              <button
+                      th:data-productid = "${item.productId}"
+                      onclick="read(this)">자세히 보기</button>
+          </div>
         </div>
     </div>
 </div>
 </body>
+<th:block layout:fragment="script">
+    <script>
+        function read(button) {
+            //productId구해서 read/1요청하자.(get)
+            //const productId = button.getAttribute('data-productid');
+            const productId = button.dataset.productid;
+            //동기식으로 get요청할 때(화면전환됨.)
+            location.href = "/product/read/" + productId;
+        }
+    </script>
+</th:block>
 </html>

@@ -8,18 +8,27 @@
             <div class="col-lg-6 col-md-8 col-sm-10">
                 <div class="card shadow-sm">
                     <div class="card-header bg-success text-white text-center">
-                        <h2>게시글 작성</h2>
+                        <h2>게시글 수정</h2>
                     </div>
                     <div class="card-body">
-                        <form action="/board/create2" method="post">
+                        <form action="/board/update2" method="post">
+                            <div class="mb-3">
+                                <label for="no" class="form-label">번호</label>
+                                <input type="text" id="no" name="no" class="form-control"
+                                       style="background-color: snow"
+                                       th:value="${boardVO.no}" readonly required>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="title" class="form-label">제목</label>
-                                <input type="text" id="title" name="title" class="form-control" placeholder="제목을 입력하세요" required>
+                                <input type="text" id="title" name="title" class="form-control" th:value="${boardVO.title}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="content" class="form-label">내용</label>
-                                <textarea id="content" name="content" class="form-control" rows="5" placeholder="내용을 입력하세요" required></textarea>
+                                <textarea id="content" name="content" class="form-control" rows="5"
+                                          style="height: 300px; white-space: pre-line;"
+                                          th:text="${boardVO.content}"  required></textarea>
                             </div>
 
                             <div class="mb-3">
@@ -31,7 +40,7 @@
                             </div>
 
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-secondary">작성하기</button>
+                                <button type="submit" class="btn btn-secondary">수정하기</button>
                             </div>
                         </form>
                     </div>
@@ -40,4 +49,5 @@
         </div>
     </div>
 </div>
+
 </html>

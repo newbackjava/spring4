@@ -2,58 +2,138 @@ package com.example.spring4.board.controller;
 
 import com.example.spring4.board.service.BoardService;
 import com.example.spring4.board.vo.BoardVO;
+import com.example.spring4.board.vo.BoardVO;
+import com.example.spring4.member.vo.MemberVO;
+import com.example.spring4.reply.service.ReplyService;
+import com.example.spring4.reply.vo.ReplyVO;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.Level;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@Controller //싱글톤객체생성 + 아래에 나온 주소와 함수를 스프링에 등록
-@RequestMapping("board") //contextpath/board
+@Log4j2
+//@Slf4j
+@Controller
+@RequestMapping("board")
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
+    private final ReplyService replyService;
 
-    @GetMapping("board") //contextpath/board/board
-    public String board(Model model) {
-        System.out.println("board 화면 요청>>>>>>>>>>>>>>>> ");
-        //전체 목록
-        List<BoardVO> list  = boardService.selectBoardAll();
-        System.out.println("list.size() " + list.size());
-        System.out.println(" -------------list----------");
-        System.out.println(list);
+    @GetMapping("board")
+    public String board(Model model){
+        System.out.println("board 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        List<BoardVO> list = boardService.getAllBoards();
         model.addAttribute("list", list);
-        //model은 templates파일까지 list데이터 전달(주소가 전달)
-        return "board/board"; //templates/board/board.html을 호출..
+        log.log(Level.WARN, "전체 db목록 가지고 오다가 문제 생김.");
+        log.info("Log4j2 with Lombok example.");
+        log.error("This is an error log.");
+        return "board/board";
     }
 
     @GetMapping("create")
-    public String create() {
-        return "board/create"; //글쓰기 화면 요청
+    public String create(BoardVO boardVO, Model model) {
+        System.out.println("create 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        return "board/create";
     }
 
     @PostMapping("create2")
-    public String create2(BoardVO boardVO) {
-        boardService.insertBoard(boardVO);
-        //db에 넣고!! --> 삽입성공! 또는 게시판리스트!
-        //list를 구해서 넘겨야하는데 전달될 list가 없어서 빈화면이 나타남.!
-        //return "board/board"; //templates/board/board.html호출!
-        return "redirect:/board/board";
-        //response.sendRedirect("/board/board")를 브라우저에게 호출하도록 명령
-        //get요청!
-        //@GetMapping("board")로 넘어감.
-    }
-    @GetMapping("read")
-    public String read(int no, Model model) {
-        //검색해서 가지고 온다음에
-        BoardVO boardVO = boardService.selectBoardByNo(no);
+    public String create2(BoardVO boardVO, Model model) {
+        System.out.println("create2 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        // Java (Spring)
+        boardVO.setContent(boardVO.getContent().replace("\n", "<br>"));
 
-        //model로 넘기자.
-        model.addAttribute("boardVO", boardVO);
+        try {
+            int result = boardService.insertBoard(boardVO);
+            if (result == 1) {
+                model.addAttribute("boardVO", boardVO);
+                return "board/create2";
+            } else {
+                return "error/error";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error/error";
+        }
+    }
+
+
+    @GetMapping("delete")
+    public String delete(int no, Model model) {
+        System.out.println("delete 처리 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println("board no >>>>>>>>>>>>> " + no);
+        int result = boardService.deleteBoard(no);
+        if (result > 0) {
+            //삭제후 전체 목록을 가지는 화면이 필요함.
+            //board/board.html에 전체 목록을 구해 전달해야함.
+            List<BoardVO> list = boardService.getAllBoards();
+            model.addAttribute("list", list);
+            return "board/board";
+        }else{
+            return "error/error";
+        }
+    }
+
+    @GetMapping("read")
+    public String read(int no, Model model){
+        System.out.println("read 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        BoardVO boardVO = boardService.getBoardByNo(no);
+
+        // Java (Spring)
+        boardVO.setContent(boardVO.getContent().replace("<br>", "\n"));
+        List<ReplyVO> list = replyService.getReplyByBbsNo(no);
+
+        if(boardVO != null){
+            model.addAttribute("boardVO", boardVO);
+            model.addAttribute("list", list);
+        }
         return "board/read";
+    }
+
+    @GetMapping("find")
+    public String read(String find, Model model){
+        System.out.println("find 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+        List<BoardVO> list = boardService.getBoardByContent(find);
+        System.out.println("list.size() >>>>>>>>>>>>>>>>>>>>>>>>>>>> " + list.size());
+        model.addAttribute("list", list);
+        return "board/board";
+    }
+
+    @GetMapping("update")
+    public String update(int no, Model model){
+        System.out.println("update 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println("update id >>>>>>>>>>>>> " + no);
+
+        //no로 검색한 것을 수정화면에 보내자.
+        BoardVO boardVO = boardService.getBoardByNo(no);
+        // Java (Spring)
+        boardVO.setContent(boardVO.getContent().replace("<br>", "\n"));
+
+        model.addAttribute("boardVO", boardVO);
+        return "board/update";
+    }
+
+    @PostMapping("update2")
+    public String update2(BoardVO boardVO, Model model){
+        System.out.println("update2 처리 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        //스프링에게 클라이언트가 입력한 정보를 받아서 vo객체생성 후
+        System.out.println("boardVO >>>>>>>>>>>>> " + boardVO);
+        int result = boardService.updateBoard(boardVO);
+        if (result > 0) {
+            return "board/update2";
+        }else{
+            return "error/error";
+        }
     }
 }

@@ -1,46 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <body>
-
 <div layout:fragment="content">
+
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8 col-sm-10">
-                <div class="card shadow-sm">
+            <div class="col-lg-10 col-md-12">
+                <div class="card shadow-sm border-success">
                     <div class="card-header bg-success text-white text-center">
                         <h2>게시판 목록</h2>
                     </div>
                     <div class="card-body">
-                    <!-- 검색하는 부분  -->
-                        <table class="table table-hover table-bordered" style="background: #f9f9f9;">
+                        <div class="d-grid mt-4">
+                            <div class="text-center">
+                               <form action="/board/find" method="get">
+                                   내용검색 <input name="find">
+                                   <button type="submit" class="btn btn-success">검색</button>
+                               </form>
+                            </div>
+                        </div>
+                        <table class="table table-bordered  table-hover" style="background-color: #f9f9f9;">
                             <thead class="bg-warning text-white">
-                                <tr class="text-center">
-                                    <th scope="col">번호</th>
-                                    <th scope="col">제목</th>
-                                    <th scope="col">작성자</th>
-                                </tr>
+                            <tr  class="text-center">
+                                <th scope="col">번호</th>
+                                <th scope="col">제목</th>
+                                <th scope="col">작성자</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="boardVO : ${list}" class="text-center">
-                                    <td>[[${boardVO.no}]]</td>
-                                    <td>
-                                        <a th:href="@{/board/read(no=${boardVO.no})}" style="text-decoration: none">
-                                            <!-- a href="board/read?no=1" -->
-                                            [[${boardVO.title}]]
-                                        </a>
-                                    </td>
-                                    <td>[[${boardVO.writer}]]</td>
-                                </tr>
+                            <tr th:each="boardVO : ${list}">
+                                <td th:text="${boardVO.no}"  class="text-center"></td>
+                                <td>
+                                    <a th:href="@{/board/read(no=${boardVO.no})}" style="text-decoration: none;">
+                                        [[${boardVO.title}]]
+                                    </a>
+                                </td>
+                                <td th:text="${boardVO.writer}"  class="text-center"></td>
+                            </tr>
                             </tbody>
                         </table>
-                        <!-- 로그인되었을 때 글작성 버튼  -->
-                        <div th:if="${session.id != null}" class="d-grid mt-4">
-                            <a href="/board/create" class="btn btn-secondary btn-lg">
-                                새 게시글 작성
-                            </a>
+                        <div class="d-grid mt-4" th:if="${session.id != null}">
+                            <a href="/board/create" class="btn btn-secondary btn-lg">새 게시글 작성</a>
                         </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+
+
+<div layout:fragment="content">
+
+    <div class="container mt-5">
+        <div id="piechart" class="chart" style="width: 300px; height: 300px;"></div>
+        <div id="map" style="width:100%;height:100%;"></div>
+        <button onclick="drawChart()">차트</button>
+        <button onclick="drawChart2()">차트(json)</button>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Task', 'Hours per Day'],
+                ['Work',     11],
+                ['Eat',      2],
+                ['Commute',  2],
+                ['Watch TV', 2],
+                ['Sleep',    7]
+            ]);
+
+            var options = {
+                title: 'My Daily Activities'
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+            chart.draw(data, options);
+        }
+
+        function drawChart2() {
+            let dataset = [];
+
+            // 서버에서 데이터 가져오기
+            axios.get('/chart/chart2')
+                .then(response => {
+                    const data = response.data;
+                    console.log(data);
+                    // 첫 번째 행은 헤더를 추가
+                    dataset.push(["Task", "Hours per Day"]);
+
+                    // 데이터를 순회하며 배열에 추가
+                    data.forEach(item => {
+                        dataset.push([item.doing, item.time2]); // item.work과 item.time2를 올바르게 수정
+                    });
+
+                    console.log(dataset);
+
+                    // 데이터가 준비되면 차트를 그리기
+                    var chartData = google.visualization.arrayToDataTable(dataset);
+                    var options = {
+                        title: 'My Daily Activities2'
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                    chart.draw(chartData, options);
+                })
+                .catch(error => {
+                    console.error("Error fetching chart data:", error);
+                });
+        }
+
+    </script>
+    </head>
+
+</th:block>
+</body>
+</html>

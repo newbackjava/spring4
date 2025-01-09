@@ -49,6 +49,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://jitpack.io" // Jitpack 저장소 추가
+    }
 }
 
 dependencies {
@@ -84,6 +87,12 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+    // Log4j2
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    // Optional: Log4j2 Core & SLF4J
+    implementation 'org.apache.logging.log4j:log4j-core'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl'
 
     //************************************************************************
     //  spring security
@@ -124,6 +133,17 @@ dependencies {
     // lombok을 이용해 Junit 테스트를 진행하는 경우 추가
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    /////////////////////////////////////////////////////////////////////////////
+    //결제
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+}
+
+configurations {
+    // 기본 Logback 의존성 제거
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 

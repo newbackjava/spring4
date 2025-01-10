@@ -35,6 +35,13 @@
             color: #555;
         }
 
+        .detail-container .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
         .detail-container button {
             background-color: #007bff;
             color: white;
@@ -58,60 +65,73 @@
             background-color: #218838;
         }
     </style>
-</head>
-<body>
+    <script>
+        function addToCart(button) {
+            console.log("Added to Cart");
 
+            const product_id = button.dataset.productid;
+            const member_id = button.dataset.memberid;
+            console.log("확인 >>>> " + product_id + "  -  " + member_id);
+            // const product_name = button.dataset.name;
+            // const product_price = button.dataset.price;
+
+            // const product_id = button.getAttribute('data-id');
+            // const product_name = button.getAttribute('data-name');
+            // const product_price = button.getAttribute('data-price');
+
+            //console.log(button.dataset.id);   // 콘솔에 product.id 출력
+            // console.log(button.dataset.name); // 콘솔에 product.name 출력
+            // console.log(button.dataset.price); // 콘솔에 product.price 출력
+
+
+            axios.post('/cart/create', {
+                productId: product_id,
+                memberId: member_id
+            })
+                .then(response => {
+                    if(response.data) {
+                        alert("장바구니에 추가되었습니다: " + response.data);
+                        let result = confirm("장바구니로 이동하시겠습니까?");
+                        if(result) {
+                            location.href="/cart/cart";
+                        }
+                    }else{
+                        alert("장바구니 추가 중 오류생김.")
+                    }
+                })
+                .catch(error => {
+                    console.error("장바구니 추가 중 오류 발생:", error);
+                    alert("장바구니에 추가하는 동안 문제가 발생했습니다.");
+                });
+        }
+    </script>
+</head>
+
+<body>
 <div layout:fragment="content">
     <div class="detail-container">
-    <!--
-            이미지 넣고
-            이름 넣고
-            설명 넣고
-            가격 넣고
-            뒤로가기 버튼
-            -->
-        <img th:src="'/img/' + ${productVO.img}">
-        <h3 th:text="${productVO.name}"></h3>
-        <p th:text="${productVO.content}"></p>
-        <p th:text="${productVO.price}"></p>
-        <button onclick="history.back()">뒤로가기</button>
-        <button th:if="${session.id != null}" class="cart-button"
-                onclick="addToCart()">
-            장바구니에 담기
-        </button>
+        <img th:src="'/img/' + ${productVO.img}" th:alt="${productVO.img}">
+        <h3 th:text="${productVO.name}">물건 이름</h3>
+        <p th:text="${productVO.content}">물건 설명</p>
+        <p th:text="${productVO.price}">물건 가격</p>
+        <button onclick="history.back()">뒤로 가기</button>
+        <!--        <button class="cart-button"-->
+        <!--                th:data-id="${product.id}"-->
+        <!--                th:data-name="${product.name}"-->
+        <!--                th:data-price="${product.price}"-->
+        <!--                onclick="addToCart(this)">장바구니에 담기</button>-->
+
+
+        <button class="cart-button"
+                th:if="${session.id != null}"
+                th:data-productid="${productVO.productId}"
+                th:data-memberid="${session.id}"
+                onclick="addToCart(this)">장바구니에 담기</button>
+        <!--        th:data-모두소문자, 대문자를 썼더라도 무시함.
+                    자바스크립트에서 이 값을 가지고 올 때 소문자로 해야 한식함.
+                    button.data.모두소문자(****중요)
+        -->
     </div>
 </div>
 </body>
-<th:block layout:fragment="script">
-    <script>
-        function addToCart() {
-            alert("장바구니 넣기 호출")
-            // INSERT INTO cart(memberId, productId, count)
-            // VALUES (#{memberId}, #{productId}, #{count})
-            const memberId = '[[${session.id}]]';
-            //const memberId = 'apple';
-            const productId = '[[${productVO.productId}]]';
-            //const productId = '24';
-            //const productId = 24;
-            //타임리프로 출력한 결과가 숫자인 경우에는 '생략가능
-            //axios.post("주소", {json데이터})
-            axios.post("/cart/create", {
-                memberId: memberId,
-                productId: productId
-            }).then(function (response) {
-                if(response.data) {
-                    alert("장바구니에 추가되었습니다.");
-                    const result = confirm("장바구니로 이동하시겠습니까?");
-                    if(result){
-                        //get방식
-                        location.href = "/cart/cart";
-                    }
-                }
-            }).catch(function (error) {
-                console.log(error);
-            });
-
-        }
-    </script>
-</th:block>
 </html>

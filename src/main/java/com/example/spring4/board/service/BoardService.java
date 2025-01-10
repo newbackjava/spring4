@@ -2,8 +2,9 @@ package com.example.spring4.board.service;
 
 import com.example.spring4.board.dao.BoardMapper;
 import com.example.spring4.board.vo.BoardVO;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,5 +37,12 @@ public class BoardService {
 
     public List<BoardVO> getBoardByContent(String find) {
         return boardMapper.getBoardByContent(find);
+    }
+
+    public PageInfo<BoardVO> getAllBoardsPage(int pageNum, int pageSize) {
+        // PageHelper로 페이징 시작
+        PageHelper.startPage(pageNum, pageSize);
+        List<BoardVO> list = boardMapper.getAllBoardsPage();
+        return new PageInfo<>(list); // PageInfo에 결과를 래핑
     }
 }

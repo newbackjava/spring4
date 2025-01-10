@@ -1,53 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.spring4.board.dao.BoardMapper">
-<!--    MemberMapper.java와 연결이 됨.-->
 
+<mapper namespace="com.example.spring4.board.dao.BoardMapper">
 
     <insert id="insertBoard"
-            parameterType="com.example.spring4.board.vo.BoardVO">
-        INSERT INTO board(title, content, writer)
-        VALUES (#{title}, #{content}, #{writer})
+            parameterType="boardVO">
+        insert into board(title, content, writer, img)
+        values (#{title}, #{content}, #{writer}, #{img})
     </insert>
 
+    <!-- 게시글 수정 -->
     <update id="updateBoard"
             parameterType="boardVO">
         UPDATE board
-        SET title = #{title}, content = #{content}
+        SET title = #{title},
+            content = #{content}
         WHERE no = #{no}
     </update>
 
+    <!-- 게시글 삭제 -->
     <delete id="deleteBoard"
             parameterType="int">
         DELETE FROM board
         WHERE no = #{no}
     </delete>
 
-    <!-- 게시판 하나 검색   -->
+    <!-- 게시글 번호로 조회 -->
     <select id="selectBoardByNo"
             parameterType="int"
-            resultType="com.example.spring4.board.vo.BoardVO">
-        SELECT no, title, content, writer
+            resultType="boardVO">
+        SELECT no, title, content, writer, img
         FROM board
         WHERE no = #{no}
     </select>
 
-    <!-- 게시판 목록 검색    -->
     <select id="selectBoardAll"
-            resultType="com.example.spring4.board.vo.BoardVO">
-        SELECT no, title, content, writer
+            resultType="boardVO">
+        SELECT no, title, content, writer, img
         FROM board
-        ORDER BY no DESC
-        <!-- 내림차순으로 정렬해야 최신 게시물이 맨 위로 온다. -->
+        order by no desc
     </select>
 
-    <!-- 게시판 내용 조건 검색   -->
     <select id="getBoardByContent"
             parameterType="string"
-            resultType="com.example.spring4.board.vo.BoardVO">
-        SELECT no, title, content, writer
+            resultType="boardVO">
+        SELECT no, title, content, writer, img
         FROM board
         WHERE content LIKE CONCAT('%', #{find}, '%')
+        ORDER BY no DESC
     </select>
+
+    <select id="getAllBoardsPage" resultType="boardVO">
+        SELECT * FROM board
+        ORDER BY no DESC
+    </select>
+
 </mapper>

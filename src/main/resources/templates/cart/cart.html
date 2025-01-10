@@ -28,42 +28,32 @@
                                     <th scope="col" colspan="2"></th>
                                 </tr>
                                 </thead>
-                            <tbody>
-                            <tr th:each="cart : ${carts}">
-                                <td>
-                                   <input type="checkbox" th:value="${cart.no}">
-                                </td>
-                                <td>[[${cart.no}]]</td>
-                                <td>[[${cart.memberId}]]</td>
-                                <td>[[${cart.memberName}]]</td>
-                                <td>[[${cart.memberTel}]]</td>
-                                <td>[[${cart.productId}]]</td>
-                                <td>[[${cart.productName}]]</td>
-                                <td>[[${cart.productPrice}]]</td>
-                                <td>
-                                    <!-- 반복문으로 만들어진 input의 데이터를 가지고 오려면
-                                        유니크한 아이디를 생성해주어야 자바스크립트에서
-                                        해당하는 input의 값을 가지고 올 수 있다.!
-                                    -->
-                                    <input type="number"
-                                           th:id="'count' + ${cart.no}"
-                                           th:value="${cart.count}">
-                                </td>
-                                <td>
-                                    <button class="btn btn-outline-dark"
-                                            th:data-no = "${cart.no}"
-                                            th:data-count = "${cart.count}"
-                                            onclick="updateCount(this)">수정</button>
-                                </td>
-                                <td>
-                                    <button class="btn btn-outline-dark"
-                                            th:data-no = "${cart.no}"
-                                            onclick="deleteProduct(this)">삭제</button>
-                                </td>
-                            </tr>
-                            </tbody>
-
-
+                                <tbody>
+                                <tr th:each="cart : ${carts}">
+                                    <td class="text-center">
+                                        <input type="checkbox" class="check" th:value="${cart.no}">
+                                    </td>
+                                    <td th:text="${cart.no}" class="text-center"></td>
+                                    <td th:text="${cart.memberId}" class="text-center"></td>
+                                    <td th:text="${cart.memberName}" class="text-center"></td>
+                                    <td th:text="${cart.memberTel}" class="text-center"></td>
+                                    <td th:text="${cart.productId}" class="text-center"></td>
+                                    <td th:text="${cart.productName}" class="text-center"></td>
+                                    <td th:text="${cart.productPrice}" class="text-center"></td>
+                                    <td class="text-center">
+                                        <input type="number" name="count" th:id="'count' + ${cart.no}"
+                                               th:value="${cart.count}" min="1" style="width: 70px;">
+                                    </td>
+                                    <td class="text-center" style="width: 150px;">
+                                        <button class="update btn btn-outline-dark"
+                                                th:data-no="${cart.no}"
+                                                onclick="updateCount(this)">수정</button>
+                                        <button class="delete btn btn-outline-dark"
+                                                th:data-no="${cart.no}"
+                                                onclick="deleteProduct(this)">삭제</button>
+                                    </td>
+                                </tr>
+                                </tbody>
                             </table>
                             <div class="d-flex justify-content-between mt-4">
                                 <button class="btn btn-secondary btn-lg"
@@ -84,45 +74,126 @@
         </script>
     </div>
 </div>
-</body>
+
 <th:block layout:fragment="script">
     <script>
-        function deleteProduct(button) {
-           // DELETE FROM cart
-           // WHERE no = #{no}
-           // th:data-no = "${cart.no}"
-            const no = button.dataset.no;
-            alert(no);
-            axios.post("/cart/delete", {
-                no: no
-            }).then(function (response) {
-                if(response.data){
-                    alert("삭제되었습니다.");
-                    location.reload();//페이지 다시 불러오기
+        // 전체 선택/해제 기능
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('.check');
+            //checkbox input 목록을 가지고 획득
+            const selectAll = document.getElementById('selectAll');
+            //selectAll의 checked한 상태의 값을 획득
+            checkboxes.forEach(checkbox => {
+                //checkbox들을 하나씩 꺼내, selectAll의 checked값과 동일한 값 할당
+                //selectAll이 false이면 모두 false처리됨
+                //selectAll이 true이면 모두 true처리됨.
+                checkbox.checked = selectAll.checked;
+            }); //forEach
+        } //토글처리
+
+        // 선택한 상품 삭제하기
+        function deleteProducts() {
+            const checkboxes = document.querySelectorAll('.check');
+            //checkbox리스트를 모두 획득
+            let deleteNoList = new Array();
+            checkboxes.forEach(checkbox => {
+                //checkbox들을 하나씩 꺼내서
+                //각 값이 checked가 true인지 확인하여
+                //checked == true인 것만
+                //삭제함.
+
+                if(checkbox.checked) {
+                    deleteNoList.push(checkbox.value);
                 }
-            }).catch(function (error) {
-                console.log(error);
-            });
-        };
+
+            }); //forEach
+            console.log(deleteNoList.length);
+            console.log(deleteNoList);
+
+            if (deleteNoList.length === 0) {
+                alert("삭제할 상품을 선택하세요.");
+                return;
+            }
+
+            // Axios를 이용해 서버에 데이터 전송
+            //json으로 보낼 때
+            //--> 서버의 컨트롤러에서 자바의 map으로 매핑
+            // axios.post('/cart/deleteProducts', {
+            //     deleteNoList: deleteNoList
+            // })
+
+            //배열(리스트를 보낼 때)
+            // --> 서버의 컨트롤러에서 자바의 list로 매핑
+
+            axios.post('/cart/deleteProducts', deleteNoList)
+                .then(response => {
+                    if (response.data > 0) {
+                        alert("선택된 상품이 삭제되었습니다.");
+                        location.reload(); // 페이지 새로고침
+                    } else {
+                        alert("삭제 실패!");
+                    }
+                })
+                .catch(error => {
+                    console.error("에러 발생:", error);
+                    alert("삭제 중 문제가 발생했습니다.");
+                });
+        } //delete
+
+        // 수량 업데이트 요청
         function updateCount(button) {
-            // UPDATE cart
-            // SET count = #{count}
-            // WHERE no = #{no}
             const no = button.dataset.no;
-            const count = document.getElementById("count" + no).value;
-            alert(no +  " " + count);
-            axios.post("/cart/update", {
+            const updateCount = document.getElementById('count' + no).value;
+            console.log((no + " " + updateCount));
+
+            if (updateCount <= 0) {
+                alert("수량은 1 이상이어야 합니다.");
+                return;
+            }
+
+            // Axios 요청으로 서버에 데이터 전송
+            axios.post('/cart/update', {
                 no: no,
-                count: count
-            }).then(function (response) {
-                if(response.data){
-                    alert("수정되었습니다.");
-                    location.reload();//페이지 다시 불러오기
-                }
-            }).catch(function (error) {
-                console.log(error);
-            });
-        };
+                count: updateCount
+            })
+                .then(response => {
+                    if (response.data > 0) {
+                        alert("수정되었습니다.");
+                        //location.reload(); // 페이지 새로고침
+                    } else {
+                        alert("수정 실패!");
+                    }
+                })
+                .catch(error => {
+                    console.error("에러 발생:", error);
+                    alert("수정 중 문제가 발생했습니다.");
+                });
+        }
+
+        // 제품 삭제 요청(함수명 delete를 사용할 수 없음.)
+        function deleteProduct(button) {
+            const no = button.dataset.no;
+            console.log(no)
+
+            // Axios 요청으로 서버에 데이터 전송
+            axios.post('/cart/delete', {
+                no: no
+            })
+                .then(response => {
+                    if (response.data > 0) {
+                        alert("삭제되었습니다.");
+                        location.reload(); // 페이지 새로고침
+                    } else {
+                        alert("삭제 실패!");
+                    }
+                })
+                .catch(error => {
+                    console.error("에러 발생:", error);
+                    alert("삭제 중 문제가 발생했습니다.");
+                });
+        }
     </script>
+
 </th:block>
+</body>
 </html>

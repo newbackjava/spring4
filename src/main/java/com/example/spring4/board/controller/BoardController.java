@@ -1,45 +1,56 @@
 package com.example.spring4.board.controller;
 
-import com.example.spring4.board.service.BoardService;
 import com.example.spring4.board.vo.BoardVO;
-import com.example.spring4.board.vo.BoardVO;
-import com.example.spring4.member.vo.MemberVO;
 import com.example.spring4.reply.service.ReplyService;
 import com.example.spring4.reply.vo.ReplyVO;
-import jakarta.servlet.http.HttpSession;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.Level;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
+import com.example.spring4.board.service.BoardService;
 
-@Log4j2
-//@Slf4j
+//@Log4j2
+@Slf4j
 @Controller
 @RequestMapping("board")
 @RequiredArgsConstructor
 public class BoardController {
 
+    @Value("${upload.path}")
+    private String uploadPath;
+
     private final BoardService boardService;
     private final ReplyService replyService;
 
+    @GetMapping("/board")
+    public String board(
+            @RequestParam(defaultValue = "1") int page, // 기본 페이지 번호
+            @RequestParam(defaultValue = "10") int size, // 페이지 크기
+            Model model) {
+
+        PageInfo<BoardVO> pageInfo = boardService.getAllBoardsPage(page, size);
+        model.addAttribute("pageInfo", pageInfo);
+        return "board/board";
+    }
+
+    /*
     @GetMapping("board")
     public String board(Model model){
         System.out.println("board 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         List<BoardVO> list = boardService.getAllBoards();
         model.addAttribute("list", list);
-        log.log(Level.WARN, "전체 db목록 가지고 오다가 문제 생김.");
-        log.info("Log4j2 with Lombok example.");
-        log.error("This is an error log.");
         return "board/board";
     }
+    */
+
 
     @GetMapping("create")
     public String create(BoardVO boardVO, Model model) {
@@ -47,6 +58,51 @@ public class BoardController {
         return "board/create";
     }
 
+
+    @PostMapping("create2")
+    public String createBoard(@ModelAttribute BoardVO boardVO,
+                              @RequestParam("file") MultipartFile file,
+                              Model model) {
+
+        System.out.println("------------------ " + boardVO);
+        try {
+            // 파일 업로드 처리
+            if (!file.isEmpty()) {
+
+                String originalFileName = file.getOriginalFilename();
+                String uuid = UUID.randomUUID().toString();
+                String savedFileName = uuid + "_" + originalFileName;
+                System.out.println(uploadPath);
+                File uploadDir = new File(uploadPath);
+                System.out.println(uploadDir.getAbsolutePath());
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                file.transferTo(new File(uploadPath + "/" + savedFileName));
+                boardVO.setImg(savedFileName); // DB에 저장할 파일 이름
+                System.out.println("------------------ " + boardVO.getImg());
+            }
+
+            // 줄바꿈 처리
+            boardVO.setContent(boardVO.getContent().replace("\n", "<br>"));
+
+            // 게시글 저장
+            int result = boardService.insertBoard(boardVO);
+            if (result == 1) {
+                model.addAttribute("boardVO", boardVO);
+                return "board/create2";
+            } else {
+                return "error/error";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "error/error";
+        }
+    } //create2
+
+
+    /*
     @PostMapping("create2")
     public String create2(BoardVO boardVO, Model model) {
         System.out.println("create2 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -66,7 +122,7 @@ public class BoardController {
             return "error/error";
         }
     }
-
+    */
 
     @GetMapping("delete")
     public String delete(int no, Model model) {
@@ -81,8 +137,8 @@ public class BoardController {
             return "board/board";
         }else{
             return "error/error";
-        }
-    }
+        } //e;se
+    } //delete
 
     @GetMapping("read")
     public String read(int no, Model model){
@@ -98,17 +154,17 @@ public class BoardController {
             model.addAttribute("list", list);
         }
         return "board/read";
-    }
+    }//read
 
     @GetMapping("find")
-    public String read(String find, Model model){
+    public String find(String find, Model model){
         System.out.println("find 화면 호출 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
         List<BoardVO> list = boardService.getBoardByContent(find);
         System.out.println("list.size() >>>>>>>>>>>>>>>>>>>>>>>>>>>> " + list.size());
         model.addAttribute("list", list);
         return "board/board";
-    }
+    } //find
 
     @GetMapping("update")
     public String update(int no, Model model){
@@ -122,7 +178,7 @@ public class BoardController {
 
         model.addAttribute("boardVO", boardVO);
         return "board/update";
-    }
+    } //update
 
     @PostMapping("update2")
     public String update2(BoardVO boardVO, Model model){
@@ -135,5 +191,6 @@ public class BoardController {
         }else{
             return "error/error";
         }
-    }
+    }//update2
+
 }

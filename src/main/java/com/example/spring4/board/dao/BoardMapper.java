@@ -13,6 +13,5 @@ public interface BoardMapper {
     int updateBoard(BoardVO boardVO);
     int deleteBoard(int no);
     List<BoardVO> getBoardByContent(String find);
+    List<BoardVO> getAllBoardsPage();
 }
-
-

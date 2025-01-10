@@ -11,15 +11,19 @@
                         <h2>게시글 작성</h2>
                     </div>
                     <div class="card-body">
-                        <form action="/board/create2" method="post">
+                        <form action="/board/create2" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="title" class="form-label">제목</label>
-                                <input type="text" id="title" name="title" class="form-control" placeholder="제목을 입력하세요" required>
+                                <input type="text" id="title" name="title" class="form-control"
+                                       value="난 제목"
+                                       placeholder="제목을 입력하세요" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="content" class="form-label">내용</label>
-                                <textarea id="content" name="content" class="form-control" rows="5" placeholder="내용을 입력하세요" required></textarea>
+                                <textarea id="content" name="content" class="form-control" rows="5" placeholder="내용을 입력하세요" required>
+                                    내용넣어
+                                </textarea>
                             </div>
 
                             <div class="mb-3">
@@ -28,6 +32,11 @@
                                        class="form-control"
                                        style="background-color: snow"
                                        th:value="${session.id}" readonly required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="file" class="form-label">파일 첨부</label>
+                                <input type="file" id="file" name="file" class="form-control">
                             </div>
 
                             <div class="d-grid">
